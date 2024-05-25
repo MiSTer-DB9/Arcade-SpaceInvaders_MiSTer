@@ -17,13 +17,6 @@ set_location_assignment PIN_AC4 -to ADC_SDI
 set_location_assignment PIN_AD4 -to ADC_SDO
 
 #============================================================
-# ARDUINO
-#============================================================
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to ARDUINO_IO[*]
-set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to ARDUINO_IO[*]
-set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to ARDUINO_IO[*]
-
-#============================================================
 # I2C LEDS/BUTTONS
 #============================================================
 set_location_assignment PIN_U14 -to IO_SCL
@@ -35,7 +28,6 @@ set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to IO_S*
 #============================================================
 # USER PORT
 #============================================================
-set_location_assignment PIN_AE15 -to USER_IO[7]
 set_location_assignment PIN_AF17 -to USER_IO[6]
 set_location_assignment PIN_AF15 -to USER_IO[5]
 set_location_assignment PIN_AG16 -to USER_IO[4]
@@ -108,7 +100,7 @@ set_instance_assignment -name ALLOW_SYNCH_CTRL_USAGE OFF -to *|SDRAM_*
 #============================================================
 # SPI SD
 #============================================================
-#set_location_assignment PIN_AE15 -to SD_SPI_CS
+set_location_assignment PIN_AE15 -to SD_SPI_CS
 set_location_assignment PIN_AH8  -to SD_SPI_MISO
 set_location_assignment PIN_AG8  -to SD_SPI_CLK
 set_location_assignment PIN_U13  -to SD_SPI_MOSI
