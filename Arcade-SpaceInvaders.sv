@@ -692,6 +692,12 @@ wire [7:0] positive_joystick_y   =  joya[15] ? ~joya[15:8] : 8'd0;
 //wire [7:0] positive_joystick_y_2   =  joya2[15] ? ~joya2[15:8] : 8'd0;
 wire [3:0] zap_throttle = positive_joystick_y[6:3];
 
+// [MiSTer-DB9 BEGIN] - D-pad fallback for analog driving (280-ZZZAP / Laguna Racer): joya idle on DB9/DB15/Saturn + digital USB pads
+wire [3:0] drive_throttle = |positive_joystick_y ? zap_throttle       : m_up    ? 4'hF   : 4'h0;
+wire [7:0] drive_steer    = |joya[7:0]           ? 8'd127 - joya[7:0] : m_left  ? 8'd255 :
+                                                                        m_right ? 8'd0   : 8'd127;
+// [MiSTer-DB9 END]
+
 /* controls for blue shark */
 wire [7:0] bluerange = { 1'b0, gun_x[7:1]+8'd8 };
 reg [7:0] blue_shark_x;
@@ -1077,8 +1083,10 @@ always @(*) begin
         mod_lagunaracer:
 	begin
  	  landscape<=0;
-			GDB0 <= sw[0] | { ~m_start1, ~m_coin1, 1'b1, fire_toggle, zap_throttle};
-         GDB1 <= 8'd127-joya[7:0];
+			// [MiSTer-DB9 BEGIN] - digital fallback throttle/steer
+			GDB0 <= sw[0] | { ~m_start1, ~m_coin1, 1'b1, fire_toggle, drive_throttle};
+         GDB1 <= drive_steer;
+         // [MiSTer-DB9 END]
          GDB2 <= sw[2] | { 1'b0, 1'b0, 1'b0,1'b0,1'b0,1'b0, 1'b0, 1'b0 };
           Trigger_ShiftCount     <= PortWr[4];
           Trigger_AudioDeviceP1  <= PortWr[2];
@@ -1091,8 +1099,10 @@ always @(*) begin
 	mod_280zap:
 	begin
  	  landscape<=1;
-	       GDB0 <= sw[0] | { ~m_start1, ~m_coin1, 1'b1, fire_toggle, zap_throttle};
-          GDB1 <= 8'd127-joya[7:0];
+	       // [MiSTer-DB9 BEGIN] - digital fallback throttle/steer
+	       GDB0 <= sw[0] | { ~m_start1, ~m_coin1, 1'b1, fire_toggle, drive_throttle};
+          GDB1 <= drive_steer;
+          // [MiSTer-DB9 END]
           GDB2 <= sw[2] | { 1'b0, 1'b0, 1'b0,1'b0,1'b0,1'b0, 1'b0, 1'b0 };
           Trigger_ShiftCount     <= PortWr[4];
           Trigger_AudioDeviceP1  <= PortWr[2];
