@@ -635,9 +635,6 @@ wire [7:0] inv_audio_data;
 wire [15:0] zap_audio_data;
 wire use_samples;
 
-//wire [15:0] cosmo_audio = {2'b0,~samples_left[15],samples_left[14:2]} + {1'b0,CosmoNoise,CosmoNoise};
-//wire [16:0] cosmo_audio = {1'b0,CosmoNoise,CosmoNoise};
-
 assign AUDIO_L = !use_samples ? {inv_audio_data,inv_audio_data} : (mod == mod_cosmo) ? {CosmoNoise,CosmoNoise} : samples_left;
 assign AUDIO_R = !use_samples ? {inv_audio_data,inv_audio_data} : samples_right;
 assign AUDIO_S = use_samples; // signed for samples, unsigned for generated
@@ -2026,6 +2023,7 @@ samples samples
 	.wave_data({wav_data,wav_data}),
 
 	.samples_ok(use_samples),
+	.mod_cosmo(mod==mod_cosmo),
 
 	.dl_addr(ioctl_addr),
 	.dl_wr(ioctl_wr),
@@ -2096,7 +2094,7 @@ reg [15:0] BB_Tone_Out;
 
 BALLOON_MUSIC BALLOON_MUSIC
 (
-    .I_MUSIC_ON(Tone_High != 7'd127),
+    .I_MUSIC_ON(Tone_High[6:0] != 7'd127),
 	 .I_TONE({1'b1,Tone_High[6:0]}),
     .O_AUDIO(BB_Tone_Out),
     .CLK(clk_10)
@@ -2147,6 +2145,18 @@ COSMO_SFX COSMO_SFX
 
 reg [3:0] C_R,C_G,C_B;
 reg [159:0] Line1,Line2;
+
+// For putting characters in at position POS
+`define LC(POS, VAL) Line1[POS*5+4:POS*5] <= VAL;
+
+// for putting nibbles in at position POS
+`define L4(POS, VAL) Line1[POS*5+3:POS*5] <= VAL;
+
+// for putting 8 bit numbers in at position POS and POS+1
+`define L8(POS, VAL) Line1[POS*5+3:POS*5] <= VAL[7:4]; Line1[POS*5+8:POS*5+5] <= VAL[3:0];
+
+// for putting 16 bit numbers in at position POS to POS+3
+`define L16(POS, VAL) Line1[POS*5+3:POS*5] <= VAL[15:12]; Line1[POS*5+8:POS*5+5] <= VAL[11:8]; Line1[POS*5+13:POS*5+10] <= VAL[7:4]; Line1[POS*5+18:POS*5+15] <= VAL[3:0];
 
 ovo OVERLAY
 (
